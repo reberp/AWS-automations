@@ -5,7 +5,7 @@ Next step:
 * configuring the VM. Intending to use ansible roles.
 
 
-Req Ansible and TF as well as AWS key environment variables as AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID
+Req Ansible and TF as well as AWS key environment variables as AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, or better though [aws configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) to set the .aws/credentials file. 
 
 Links: 
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
