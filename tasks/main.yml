@@ -1,0 +1,17 @@
+---
+# tasks file for test
+- name: Test Run TF
+  hosts: localhost
+  connection: local
+  tasks:
+
+  - name: tf test create
+    terraform:
+      project_path: '../tf'
+      state: present
+
+  - name: tf test destroy 
+    terraform:
+      project_path: '../tf'
+      state: absent
+
