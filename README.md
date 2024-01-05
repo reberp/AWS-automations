@@ -3,9 +3,10 @@ Testing combination of ansible and terraform for configuration of AWS cluster fo
 Status:
 * Creates the VPC, Subnet, SG, RT, GW, associations so VM can be internet connected
 * Creates VMs with public ips
+* Updates the inventory and confirms they're accessible
 
 Next step: 
-* configuring the VM. Intending to use ansible roles.
+* configuring the VM. Intending to use ansible roles - for kubeadm base and then addons flux helm etc. 
 
 Req:
 * Set the keyname you want to use as TF_VAR_ec2_keyname

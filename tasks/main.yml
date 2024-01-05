@@ -6,30 +6,78 @@
   connection: local
   tasks:
 
-  # add a line to a file (add hosts after making new entries)
-  # - name: test file
-  #   ansible.builtin.lineinfile:
-  #     path: "{{ playbook_dir }}/../testansiblefile2.txt"
-  #     line: "{{ playbook_dir }} and other things"
-
   - name: tf test create
     terraform:
       project_path: '../tf'
       state: present
-    #register: outputs
-    #instance ip: outputs.outputs.instance_ips.value[0]
-
-  - name: Second Task - Print node ips
+    register: outputs
+     
+  - name: Node Name to IP
     ansible.builtin.debug:
-      var: outputs.outputs.instance_ips.value
+      msg: "{{item.public_ip}} : {{item.tags[\"Name\"]}}"
+    with_items:
+      - "{{ outputs.outputs.instance_details.value }}"
 
-  # - name: Copy file with owner and permissions
-  #   ansible.builtin.copy:
-  #     content: "{{ outputs.outputs.instance_ips.value[0] }} and other things"
-  #     dest: "{{ playbook_dir }}/../testansiblefile2.txt"
+  #https://docs.ansible.com/archive/ansible/2.3/playbooks_loops.html#iterating-over-the-results-of-a-program-execution
+  #TODO Recommended instead: https://docs.ansible.com/archive/ansible/2.3/intro_dynamic_inventory.html
+  #From: https://linuxopsblog.wordpress.com/how-to-add-linessingle-multiple-to-a-file-in-ansible/
+  - name: Add to Inventory 
+    lineinfile:
+      path: "{{ playbook_dir }}/../inventory/hosts"
+      line: "{{ item.tags[\"Name\"] }} ansible_host={{ item.public_ip }} ansible_user=ubuntu ansible_ssh_private_key_file={{ playbook_dir }}/../{{item.key_name}}.pem"
+      insertafter: "remote"
+    with_items:
+      - "{{ outputs.outputs.instance_details.value }}"
 
-  - name: tf test destroy 
-    terraform:
-      project_path: '../tf'
-      state: absent
+- name: Refresh inventory to ensure new instances exist in inventory
+  hosts: localhost
+  gather_facts: false
+  connection: local 
+  tasks:
 
+  - name: refresh inventory    
+    ansible.builtin.meta: refresh_inventory
+
+  - name: show all the hosts matching the pattern
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    with_inventory_hostnames:
+      - all:!self   
+
+- name: Test new hosts
+  hosts: remote
+  gather_facts: false
+  tasks:  
+  - name: wait for hosts to come up
+    delegate_to: localhost
+    ansible.builtin.pause:
+  - name: ping hosts
+    ansible.builtin.ping:
+
+#update the actual inventory
+
+#reload inventory
+
+
+#run roles
+# - name: Setup kubeadm base
+#   hosts: #run through all, for others, should have grouped the hosts into ansible inventory groups
+#   roles:
+#     - kubeadm_base
+
+
+# - name: Check the files and AWS. Maybe run roles manually? 
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: wait
+#       ansible.builtin.pause:
+
+- name: tf test destroy 
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: destroy
+      terraform:
+        project_path: '../tf'
+        state: absent

@@ -104,7 +104,7 @@ resource "aws_security_group" "allow_ssh" {
 }
 
 resource "aws_instance" "app_server" {
-  count                   = 1
+  count                   = 2
   ami                     = var.instance["ami-id"]
   instance_type           = var.instance["type"]
   key_name                = var.ec2_keyname           
@@ -120,3 +120,10 @@ resource "aws_instance" "app_server" {
 #  value = [for e in aws_instance.app_server : e.public_ip]
 #}
 
+output "instance_names" {
+  value = [for e in aws_instance.app_server : e.tags["Name"]]
+}
+
+output "instance_details" {
+  value = [for e in aws_instance.app_server : e]
+}

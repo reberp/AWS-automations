@@ -1,6 +1,7 @@
 # Copy of some templates for TF and Ansible gitignore suggestions 
 
-
+*.pem
+*.key
 # Local .terraform directories
 **/.terraform/*
 **/.terraform*
