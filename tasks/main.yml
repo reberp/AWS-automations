@@ -2,13 +2,31 @@
 # tasks file for test
 - name: Test Run TF
   hosts: localhost
+  gather_facts: false
   connection: local
   tasks:
+
+  # add a line to a file (add hosts after making new entries)
+  # - name: test file
+  #   ansible.builtin.lineinfile:
+  #     path: "{{ playbook_dir }}/../testansiblefile2.txt"
+  #     line: "{{ playbook_dir }} and other things"
 
   - name: tf test create
     terraform:
       project_path: '../tf'
       state: present
+    #register: outputs
+    #instance ip: outputs.outputs.instance_ips.value[0]
+
+  - name: Second Task - Print node ips
+    ansible.builtin.debug:
+      var: outputs.outputs.instance_ips.value
+
+  # - name: Copy file with owner and permissions
+  #   ansible.builtin.copy:
+  #     content: "{{ outputs.outputs.instance_ips.value[0] }} and other things"
+  #     dest: "{{ playbook_dir }}/../testansiblefile2.txt"
 
   - name: tf test destroy 
     terraform:
