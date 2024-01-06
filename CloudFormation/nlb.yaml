@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |-
+  https://raw.githubusercontent.com/awslabs/cloudformation-ldaps-nlb-template/master/NLB_SimpleAD.AWSTemplateFormatVersion
+  Sample NLB Stack
+  Requires nodes, vpc, subet, etc already setup up but then creates a frontend LB for a nodeport exposed service. 
+Parameters:
+  VPCId:
+    Description: Enter VPC ID
+    Type: AWS::EC2::VPC::Id
+  SubnetId1:
+    Description: Enter subnet ID
+    Type: AWS::EC2::Subnet::Id
+  MasterId:
+    Description: Enter the ID of the master node
+    Type: AWS::EC2::Instance::Id
+  HTTPSNodePort:
+    Description: Current NodePort set for HTTPS ingress
+    Type: Number
+
+Resources:
+
+  NetworkLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Join ["-" , [!Ref 'AWS::StackName', NLB]]
+      Scheme: internal
+      Subnets:
+        - !Ref SubnetId1
+      Type: network
+
+  NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Join ["-" , [!Ref 'AWS::StackName', Target]]
+      Port: !Ref HTTPSNodePort
+      Protocol: TCP
+      TargetType: instance
+      VpcId: !Ref VPCId
+      HealthCheckEnabled: True
+      HealthCheckProtocol: HTTPS
+      HealthCheckPath: /healthz
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPort: !Ref HTTPSNodePort
+      Targets:
+        - Id: !Ref MasterId
+          Port: !Ref HTTPSNodePort
+
+  NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NetworkLoadBalancerTargetGroup
+      LoadBalancerArn: !Ref NetworkLoadBalancer
+      Port: '443'
+      Protocol: TCP
+Outputs:
+  NLBURL:
+    Description: NLB DNS Name
+    Value: !GetAtt NetworkLoadBalancer.DNSName
