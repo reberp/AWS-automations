@@ -116,3 +116,8 @@ Resources:
       Tags:
         - Key: Name
           Value: TestInstance
+
+Outputs:
+  InstanceIP:
+    Description: The IP of the instance
+    Value: !GetAtt TestInstance.PublicIp               
