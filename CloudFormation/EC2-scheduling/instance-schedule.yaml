@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |-
+  Set up the schedule for the instance with the appropriate tags.
+  https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/manage-iac.html
+  https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/sample-schedule.html
+  https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/aws-cloudformation-templates.html
+Parameters:
+  ServiceInstanceScheduleServiceTokenARN:
+    Type: String
+    Description: (Required) service token arn taken from InstanceScheduler outputs
+Metadata:
+  'AWS::CloudFormation::Designer': {}
+Resources:
+  USWakingHours:
+    Type: 'Custom::ServiceInstanceSchedule'
+    Properties:
+      NoStackPrefix: 'True'
+      Name: us-waking-hours
+      Description: Every day, roughly waking hours in the US
+      ServiceToken: !Ref ServiceInstanceScheduleServiceTokenARN
+      Timezone: America/Chicago
+      Periods:
+      - Description: 7-9 every day
+        BeginTime: '07:00'
+        EndTime: '21:00'
+        WeekDays: sun-sat
+
