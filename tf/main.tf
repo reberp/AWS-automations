@@ -98,7 +98,7 @@ resource "aws_security_group" "test_sg" {
 }
 
 resource "aws_instance" "app_server" {
-  count                   = 2
+  count                   = 1
   ami                     = var.instance["ami_id"]
   instance_type           = var.instance["type"]
   key_name                = var.ec2_keyname           

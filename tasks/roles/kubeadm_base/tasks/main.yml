@@ -1,0 +1,6 @@
+---
+#Obv not the right way to do this, but script already existed
+- name: run install 
+  become: true
+  ansible.builtin.script: 
+    cmd: install.sh

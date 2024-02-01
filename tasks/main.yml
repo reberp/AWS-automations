@@ -54,30 +54,18 @@
   - name: ping hosts
     ansible.builtin.ping:
 
-#update the actual inventory
-
-#reload inventory
-
 
 #run roles
-# - name: Setup kubeadm base
-#   hosts: #run through all, for others, should have grouped the hosts into ansible inventory groups
-#   roles:
-#     - kubeadm_base
+- name: Setup kubeadm base
+  hosts: remote
+  roles:
+  - kubeadm_base
 
-
-# - name: Check the files and AWS. Maybe run roles manually? 
-#   hosts: localhost
-#   connection: local
-#   tasks:
-#     - name: wait
-#       ansible.builtin.pause:
-
-- name: tf test destroy 
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: destroy
-      terraform:
-        project_path: '../tf'
-        state: absent
+#- name: tf test destroy 
+#  hosts: localhost
+#  connection: local
+#  tasks:
+#    - name: destroy
+#      terraform:
+#        project_path: '../tf'
+#        state: absent
